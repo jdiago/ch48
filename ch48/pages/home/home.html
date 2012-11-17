@@ -8,7 +8,7 @@
     <body>
         <div pub-key="" sub-key="pub-4f3e077d-4da1-4467-9556-9c94faef31e6" ssl="off" origin="pubsub.pubnub.com" id="pubnub"></div>
         <div class="ch48-zone">
-            <div class="convo-title">Current Conversation</div>
+            <h1 class="convo-title">Current Conversation</h1>
             <div class="conversation"></div>
             <span class="logs"></span>
         </div>
@@ -21,20 +21,20 @@
                         since:lastChatID}
 
         getChatData();
-        setInterval(getChatData, 3000);
+        //setInterval(getChatData, 1000);
 
         function sendMsg() {
             var convoArea = document.querySelector('.conversation');
             var chatBox = document.querySelector('.chatBox');
             var chatContent = chatBox.getAttribute('value');
             var data = subData;
-            data.chat_content=chatContent;
-            WinJS.xhr({ url: 'http://ch4t.herokuapp.com/rooms/2.json?', data: data, responseType: 'json' });
-            convoArea.innerText = '';
+            data['chat_content'] = chatContent;
+            chatBox.setAttribute('value', '');
+            WinJS.xhr({ url: 'http://ch4t.herokuapp.com/rooms/3/chats?', data:data,type:"POST"});
         }
 
         function getChatData() {
-            WinJS.xhr({ url: 'http://ch4t.herokuapp.com/rooms/2.json?', data: subData, responseType: 'json' }).done(function fulfilled(result) {
+            WinJS.xhr({ url: 'http://ch4t.herokuapp.com/rooms/3.json?', data: subData, responseType: 'json' }).done(function fulfilled(result) {
                 if (result.status == 200) {
                     var log = document.querySelector('.logs');
                     chatData = JSON.parse(result.responseText);
@@ -43,7 +43,7 @@
                     log.innerText = chatData.chats[0].content;
                     var chatCount = chatData.chats.length;
 
-                    if (chatCount > 0 && chatData.chats[chatCount-1].id > lastChatID) {
+                    if (chatCount > 0 && chatData.chats[chatCount - 1].id > lastChatID) {
                         for (var i = 0; i<chatData.chats.length; i++) {
                             var chatEl = document.createElement('span');
 
