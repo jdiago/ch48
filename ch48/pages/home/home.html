@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>Test</title>
+       <script src="/js/pubnub-3.3.1.min.js"></script>
+        <!--<script src="/js/jquery.min.js" type="text/javascript"></script>-->
+    </head>
+    <body>
+        <div pub-key="" sub-key="pub-4f3e077d-4da1-4467-9556-9c94faef31e6" ssl="off" origin="pubsub.pubnub.com" id="pubnub"></div>
+        <div class="ch48-zone">
+            <div class="convo-title">Current Conversation</div>
+            <div class="conversation"></div>
+            <span class="logs"></span>
+        </div>
+        <div><textarea class="chatBox"></textarea><input type="button" value="Send" onclick="javascript:sendMsg()"/></div>
+    </body>
+
+    <script type="text/javascript">
+        var chatData, lastChatID=0;
+        var subData = { 'oauth_token': 'ch4t-85bc2111578efd30cdef75006887152e17e0b42a12d53172c5f173038af502a0-8d566ce40f4554eb7022c0364c5c7efa',
+                        since:lastChatID}
+
+        getChatData();
+        setInterval(getChatData, 3000);
+
+        function sendMsg() {
+            var convoArea = document.querySelector('.conversation');
+            var chatBox = document.querySelector('.chatBox');
+            var chatContent = chatBox.getAttribute('value');
+            var data = subData;
+            data.chat_content=chatContent;
+            WinJS.xhr({ url: 'http://ch4t.herokuapp.com/rooms/2.json?', data: data, responseType: 'json' });
+            convoArea.innerText = '';
+        }
+
+        function getChatData() {
+            WinJS.xhr({ url: 'http://ch4t.herokuapp.com/rooms/2.json?', data: subData, responseType: 'json' }).done(function fulfilled(result) {
+                if (result.status == 200) {
+                    var log = document.querySelector('.logs');
+                    chatData = JSON.parse(result.responseText);
+                    log.innerText = chatData.room.channel_name;
+                    var convoArea = document.querySelector('.conversation');
+                    log.innerText = chatData.chats[0].content;
+                    var chatCount = chatData.chats.length;
+
+                    if (chatCount > 0 && chatData.chats[chatCount-1].id > lastChatID) {
+                        for (var i = 0; i<chatData.chats.length; i++) {
+                            var chatEl = document.createElement('span');
+
+                            chatEl.innerText = chatData.chats[i].content + "\n";
+                            convoArea.appendChild(chatEl)
+                        }
+                        lastChatID = chatData.chats[chatCount - 1].id;
+                    }                    
+                }
+                // rooms/2/chats?oauth_token
+                //chat_content
+            });
+        }
+    </script>
+</html>

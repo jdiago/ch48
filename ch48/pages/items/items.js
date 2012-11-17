@@ -12,7 +12,7 @@
             listView.itemDataSource = Data.groups.dataSource;
             listView.itemTemplate = element.querySelector(".itemtemplate");
             listView.oniteminvoked = this._itemInvoked.bind(this);
-
+            WinJS.UI.processAll();
             this._initializeLayout(listView, Windows.UI.ViewManagement.ApplicationView.value);
             listView.element.focus();
         },
